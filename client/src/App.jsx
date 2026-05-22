@@ -4,21 +4,39 @@ import SignIn from "./components/SignIn";
 import Navbar from "./components/Navbar";
 import ExpenseCard from "./components/ExpenseCard";
 import CategorySummary from "./components/CategorySummary";
+import AddExpense from "./components/AddExpense";
+import ExpenseList from "./components/ExpenseList";
+import Footer from "./components/footer";
+import { ChartNoAxesColumn, IndianRupee } from "lucide-react";
+
+
+const featureComponent = [
+  { title: "Total Expense", subtitle: "This month", Icon: IndianRupee, value: 120 },
+  { title: "Top Category", subtitle: "Highest spending", Icon: ChartNoAxesColumn, value: 100 }
+]
 
 const App = () => {
   return (
-    <div>
+    <div className="w-full relative min-h-screen bg-[#F8F8F6]">
       <Navbar />
-      <div className="flex flex-col gap-5 md:flex-row w-full h-full p-5">
+      <div className="w-full px-5">
+        <p className="w-full my-4 flex items-center font-bold text-gray-800 text-2xl">
+        Welcome Aman Raj 👋
+      </p>
+      <div className="flex flex-col gap-5 md:flex-row w-full h-full ">
         <div className="flex flex-col gap-5 w-full">
-          <div className="flex justify-between gap-5 w-full h-full">
-            <ExpenseCard />
-            <ExpenseCard />
+          <div className="flex justify-between items-stretch gap-5 w-full h-full ">
+            {featureComponent.map((item, index) => (
+              <ExpenseCard key={index} Icon={item.Icon} subtitle={item.subtitle} title={item.title} value={item.value} />
+            ))}
           </div>
-          <div className="bg-linear-to-r from-red-400 via-red-500 to-amber-800 w-full h-full rounded-xl min-h-36"></div>
+          <AddExpense />
         </div>
         <CategorySummary />
       </div>
+      </div>
+      <ExpenseList />
+      <Footer />
     </div>
   );
 };
