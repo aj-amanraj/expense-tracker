@@ -4,7 +4,7 @@ import logo from "../assets/logo.png";
 
 const Navbar = () => {
   return (
-    <div className="bg-linear-to-r from-indigo-500 via-blue-500 to-cyan-500 p-5 h-16 flex items-center justify-between w-full">
+    <div className="bg-linear-to-r from-indigo-500 via-blue-500 to-cyan-500 p-5 h-18 flex items-center justify-between w-full">
      <h1 className="serif-logo text-xl text-white">
       Expense Tracker
      </h1>
