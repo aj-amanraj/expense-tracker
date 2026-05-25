@@ -36,10 +36,10 @@ export default function ExpenseList() {
 
         <TableHead>
           <TableRow>
-            <TableCell>category</TableCell>
-            <TableCell align="right">amount</TableCell>
-            <TableCell align="right">description</TableCell>
-            <TableCell align="right">createdAt</TableCell>
+            <TableCell>CATEGORY</TableCell>
+            <TableCell align="right">AMOUNT</TableCell>
+            <TableCell align="right">DESCRIPTION</TableCell>
+            <TableCell align="right">CREATED_AT</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
