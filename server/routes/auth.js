@@ -1,9 +1,9 @@
 import { Router } from "express";
+import { signin, signup } from "../controllers/authController.js";
 
 const authRoute = Router();
 
-authRoute.get('', (req, res) => {
-    res.status(200).json({message : "asdfg"})
-})
+authRoute.post("/signup", signup);  
+authRoute.post('/signin', signin);
 
 export default authRoute;

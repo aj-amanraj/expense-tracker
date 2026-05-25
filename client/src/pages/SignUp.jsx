@@ -3,6 +3,7 @@ import login from '../assets/login.png'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import { Link, useNavigate } from 'react-router-dom'
+import { signUpUser } from '../api/auth'
 
 const SignUp = () => {
 
@@ -13,19 +14,29 @@ const SignUp = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
+        setError('');
 
         if(password.length < 6){
             setError('Password must be at least 6 characters')
             return;
         }
+        try {
+            const data = await signUpUser({
+                name,
+                email,
+                password
+            });
+            console.log(data);
 
-        console.log(`name: ${name}`)
-        console.log(`email: ${email}`)
-        console.log(`password: ${password}`)
-
-        navigate('/signin');
+            navigate('/signin');
+        } catch (error) {
+            setError(
+                error.response?.data?.message || "Signup failed"
+            );
+        }
     }
 
   return (
@@ -53,7 +64,7 @@ const SignUp = () => {
                     />
 
                     {error ? (
-                        <p className='text-sm text-red-600'>Password must be at least 6 characters</p>
+                        <p className='text-sm text-red-600'>{error}</p>
                     ) : null}
 
                     <Button variant="contained" type='submit' size='large' sx={{ textTransform: 'none' }}>

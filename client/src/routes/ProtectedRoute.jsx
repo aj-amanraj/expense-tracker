@@ -2,13 +2,10 @@ import React from 'react'
 import { Navigate } from 'react-router-dom';
 
 const ProtectedRoute = ({children}) => {
-    const isAuth = true;
+    const token = localStorage.getItem("token");
 
-    if(!isAuth){
-        return <Navigate to='/signin' />;
-    }
+    return token ? children : <Navigate to='/signin' />;
 
-    return children;
-}
+};
 
 export default ProtectedRoute

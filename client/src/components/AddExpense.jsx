@@ -7,28 +7,29 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import { createExpense } from '../api/expense';
+import { useExpense } from '../hooks/useExpense';
 
 const AddExpense = () => {
-
+  const { onReload } = useExpense();
   const [open, setOpen] = useState(false);
 
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
-  const [date, setDate] = useState('');
-  const [desc, setDesc] = useState('');
+  const [description, setDescription] = useState('');
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
     setAmount('');
     setCategory('');
-    setDate('');
-    setDesc('');
+    setDescription('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted Data : ", {amount, category, date, desc});
+    await createExpense(amount,category,description)
+    onReload();
     handleClose();
     }
 
@@ -63,11 +64,10 @@ const AddExpense = () => {
         <DialogContent className="px-6 pb-6">
           <form onSubmit={handleSubmit} className='flex flex-col gap-5 mt-3'>
             <TextField onChange={(e) => setAmount(e.target.value)}
-              id="amount" label="Amount" type='number' variant="outlined"  placeholder='₹ 0.00' fullWidth required
+              id="amount" label="Amount" type='number' value={amount} variant="outlined"  placeholder='₹ 0.00' fullWidth required
             />
-            <div className='flex gap-4'>
               <FormControl fullWidth required>
-              <InputLabel id="category">Category</InputLabel>
+              <InputLabel id="category" >Category</InputLabel>
               <Select 
                   labelId="category-select-label"
                   id="category-select"
@@ -83,13 +83,8 @@ const AddExpense = () => {
                   <MenuItem value="Others">Others</MenuItem>
               </Select>
               </FormControl>
-
-              <TextField onChange={(e) => setDate(e.target.value)}
-                  id="date" type='date' variant="outlined" fullWidth  required
-              />
-          </div>
-          <TextField onChange={(e) => setDesc(e.target.value)}
-              id="desc" label="Description" variant="outlined" multiline rows={3} 
+          <TextField onChange={(e) => setDescription(e.target.value)}
+              id="desc" value={description} label="Description" variant="outlined" multiline rows={3} 
               placeholder="What did you spend this money on?" fullWidth  required
           />
           <div className="flex gap-3 justify-end mt-2">

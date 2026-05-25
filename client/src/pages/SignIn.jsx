@@ -3,6 +3,7 @@ import login from '../assets/login.png'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import { Link, useNavigate } from 'react-router-dom'
+import { signInUser } from '../api/auth.js'
 
 const SignIn = () => {
 
@@ -12,7 +13,7 @@ const SignIn = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     setError('');
@@ -21,11 +22,31 @@ const SignIn = () => {
       setError('Password must be at least 6 characters');
       return;
     }
-    console.log(email);
-    console.log(password);
+    
+    try {
+      
+      const data = await signInUser({
+        email,
+        password
+      });
 
-    navigate('/dashboard')
-  }
+      //save token
+      localStorage.setItem(
+        "token", data.token
+      );
+      // save user for Welcome banner
+      localStorage.setItem(
+        "user", JSON.stringify(data.user)
+      );
+
+      navigate('/dashboard')
+
+    } catch (error) {
+      setError(
+        error.response?.data?.message || "Login failed"
+      );
+    }
+  };
 
   return (
     <div className='flex h-screen w-full'>

@@ -1,15 +1,19 @@
-import { Expense } from "../model/expense.js";
+import { Expense } from "../models/expense.js";
+
+/**
+ * this will create a new expense
+ */
 
 export const createExpense = async (req, res) => {
   try {
-    const { amount, category, description } = req.body;
+    const { amount, category, description } = req.body;   //destructure body to get req. fields
 
-    // const userId = req.userId;
+    const userId = req.userId;
 
-    // if(!userId){
-    //     res.status(401).json({message : "unauthorized access" , data:{}});
-    //     return;
-    // }
+    if(!userId){
+        res.status(401).json({message : "unauthorized access" , data:{}});
+        return;
+    }
 
     if (!amount || !category) {
       res
@@ -18,7 +22,7 @@ export const createExpense = async (req, res) => {
       return;
     }
 
-    const expense = await Expense.create({ amount, category, description });
+    const expense = await Expense.create({ amount, category, description, userId });    // create new expense to DB
 
     res.status(200).json({
       message: "Expense is Created Successfully",
@@ -33,9 +37,21 @@ export const createExpense = async (req, res) => {
   }
 };
 
+/**
+ * get all expense from database
+ */
+
 export const getExpense = async (req, res) => {
   try {
-    const result = await Expense.find({});
+
+    const userId = req.userId;
+
+    if(!userId){
+        res.status(401).json({message : "unauthorized access" , data:{}});
+        return;
+    }
+
+    const result = await Expense.find({userId: userId});    //filter by userId
 
     res.status(200).json({
       message: "Expense fetched Successfully",
@@ -50,11 +66,25 @@ export const getExpense = async (req, res) => {
   }
 };
 
+/**
+ * get totalExpense and maxCategoryExpense
+ */
+
 export const dashboardMatrices = async (req, res) => {
   try {
-    const [total, maxCatExpense] = await Promise.all([
-      totalExpense(),
-      catExpense(),
+
+    const userId = req.userId;
+
+    if(!userId){
+        res.status(401).json({message : "unauthorized access" , data:{}});
+        return;
+    }
+
+// compute totalExpense and maxCategoryExpense
+
+    const [total, maxCatExpense] = await Promise.all([    //this will execute both function at the same time
+      totalExpense(userId),
+      categoryExpense(userId),
     ]);
 
     res.status(200).json({
@@ -76,29 +106,45 @@ export const dashboardMatrices = async (req, res) => {
   }
 };
 
-const totalExpense = async () => {
+/**
+ * compute totalExpense
+ * @param {*} userId 
+ * @returns {Number} totalExpense
+ */
+
+const totalExpense = async (userId) => {
   try {
     const prevMonth = new Date();
     prevMonth.setMonth(prevMonth.getMonth() - 1);
 
     const expenses = await Expense.find({
-      createdAt: { $gt: prevMonth },
+      userId: userId,
+      createdAt: { $gt: prevMonth },    //get the expense created after the prev. month
     });
 
-    console.log(expenses)
-
-    const total = expenses.reduce((sum, item) => sum + item.amount, 0);
+    const total = expenses.reduce((sum, item) => sum + item.amount, 0);   //aggregate totalExpense
 
     return total;
   } catch (error) {
     console.error("Error: totalExpense", error);
   }
 };
-const catExpense = async () => {
-  try {
-    const expenses = await Expense.find({});
 
-    const expenseMap = new Map();
+/**
+ * compute maxCategoryExpense
+ * @param {*} userId 
+ * @returns {String} category, {Number} amount
+ */
+
+const categoryExpense = async (userId) => {
+  try {
+    const expenses = await Expense.find({userId: userId});
+
+    const expenseMap = new Map();     // map for storing cluster of expense category
+
+    /**
+     * we check for each expense and map the total amount categoryWise
+     */
 
     for (const expense of expenses) {
       expenseMap.set(
@@ -109,7 +155,7 @@ const catExpense = async () => {
 
     let value = 0;
     let category;
-    for (const [cat, val] of expenseMap) {
+    for (const [cat, val] of expenseMap) {    //get the category with max. amount
       if (val > value) {
         value = val;
         category = cat;
@@ -122,10 +168,20 @@ const catExpense = async () => {
   }
 };
 
-
+/**
+ * delete all expenses of userId 
+ */
 export const deleteExpense = async (req, res) => {
   try {
-    await Expense.deleteMany({})
+
+    const userId = req.params;
+
+    if(!userId){
+        res.status(401).json({message : "unauthorized access" , data:{}});
+        return;
+    }
+
+    await Expense.deleteMany({userId: userId})
     res.status(200).json({
       message: "Expense cleaned Successfully",
       data: {},
@@ -139,12 +195,26 @@ export const deleteExpense = async (req, res) => {
   }
 };
 
-
+/**
+ * compute categoryWiseExpense
+ */
 export const getCategoryWiseExpense = async (req, res) => {
   try {
-    const expenses = await Expense.find({});
 
-    const expenseMap = new Map();
+    const userId = req.userId;
+
+    if(!userId){
+        res.status(401).json({message : "unauthorized access" , data:{}});
+        return;
+    }
+
+    const expenses = await Expense.find({userId: userId});
+
+    const expenseMap = new Map();   // map for storing cluster of expense category
+
+    /**
+     * we check for each expense and map the total amount categoryWise
+     */
 
     for (const expense of expenses) {
       expenseMap.set(
@@ -155,7 +225,7 @@ export const getCategoryWiseExpense = async (req, res) => {
 
     const result = [];
 
-    for (const [cat, val] of expenseMap) {
+    for (const [cat, val] of expenseMap) {    //push the category with amount in result list
         result.push({ category: cat, amount: val});
     }
 

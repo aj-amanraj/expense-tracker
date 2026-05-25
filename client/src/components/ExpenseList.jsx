@@ -5,26 +5,27 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
-import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
+import { useEffect, useState } from "react";
+import { getExpense } from "../api/expense";
+import { useExpense } from "../hooks/useExpense";
 
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
 
-const rows = [
-  createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-  createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-  createData("Eclair", 262, 16.0, 24, 6.0),
-  createData("Cupcake", 305, 3.7, 67, 4.3),
-  createData("Gingerbread", 356, 16.0, 49, 3.9),
-];
+export default function ExpenseList() {
+  const { reload } = useExpense();
+  const [expense, setExpense] = useState([]);
 
-export default function BasicTable() {
+  const fetchExpenseList = async () => {
+    const result = await getExpense();
+
+    if(result) setExpense(result)
+  }
+
+  useEffect( () => {
+    fetchExpenseList()
+  },[reload])
+
   return (
-    <TableContainer className="p-5 pb-8 mt-5" component={Paper}>
+    <TableContainer className="p-5 pb-20 mt-5" component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
 
         <TableHead className="flex flex-col justify-between">
@@ -35,26 +36,24 @@ export default function BasicTable() {
 
         <TableHead>
           <TableRow>
-            <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell align="right">Calories</TableCell>
-            <TableCell align="right">Fat&nbsp;(g)</TableCell>
-            <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-            <TableCell align="right">Protein&nbsp;(g)</TableCell>
+            <TableCell>category</TableCell>
+            <TableCell align="right">amount</TableCell>
+            <TableCell align="right">description</TableCell>
+            <TableCell align="right">createdAt</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {expense.map((row) => (
             <TableRow
-              key={row.name}
+              key={row.category}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
               <TableCell component="th" scope="row">
-                {row.name}
+                {row.category}
               </TableCell>
-              <TableCell align="right">{row.calories}</TableCell>
-              <TableCell align="right">{row.fat}</TableCell>
-              <TableCell align="right">{row.carbs}</TableCell>
-              <TableCell align="right">{row.protein}</TableCell>
+              <TableCell align="right">{row.amount}</TableCell>
+              <TableCell align="right">{row.description}</TableCell>
+              <TableCell align="right">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
             </TableRow>
           ))}
         </TableBody>

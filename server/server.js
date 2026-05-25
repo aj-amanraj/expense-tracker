@@ -7,19 +7,17 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 8080;      // Use PORT from .env or fallback to 8080
 
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true}))
+app.use(cors({origin: '*'}));   // allow cross-origin requests for all origins
+
+app.use(express.json());    // parse JSON request body into object
+
+app.use(express.urlencoded({ extended: true}))    // parse form data
 
 mongoDb();
-route(app);
-
-app.get("/", (req, res) => {
-    res.send("Expense Tracker Dashboard");
-})
+route(app);     // function registers all application routes with the Express app
 
 app.listen(port, () => {
-    console.log(`server running on port ${port}`)
+    console.log(`server running on port ${port}`);
 })
