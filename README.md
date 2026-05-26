@@ -40,12 +40,12 @@ This project helps users track their daily expenses, categorize spending, and ma
   - npm install
   - npm run dev
 
-## Backend Setup
+### Backend Setup
   - cd backend
   - npm install
   - npm run dev
 
-## Environment variables (.env file)
+### Environment variables (.env file)
   - MONGO_URI=your_mongodb_connection_string
   - PORT=5000
   - JWT_SECRET=your_secret_key
